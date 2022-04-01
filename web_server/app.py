@@ -15,8 +15,8 @@ subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'geopy'])
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
-#API_URL = os.environ.get('API_URL')
-API_URL = 'http://6817-35-227-50-192.ngrok.io'
+API_URL = os.environ.get('API_URL', '')
+#API_URL = 'http://6817-35-227-50-192.ngrok.io'
 
 
 isAuthenticated = False
@@ -41,8 +41,8 @@ if isAuthenticated is True:
     txt = st.text_input('Location', '')
     sub_container.button('Submit', on_click=location_func)
 
-#df_catalog = pd.read_csv('streamlit_server/web_server/catlog_data.csv')
-df_catalog = pd.read_csv('./catlog_data.csv')
+df_catalog = pd.read_csv('web_server/catlog_data.csv')
+#df_catalog = pd.read_csv('./catlog_data.csv')
 images_dir = './'
 
 
@@ -94,7 +94,7 @@ def location_func():
         if event_id:
             st.write(event_id)
             #params = {"idx_id": str(event_id)[-2:]}
-            params = {"idx_id": random.randrange(10,50)}
+            params = {"idx_id": random.randrange(10,50), "location": txt}
             URL = API_URL + "/event"
             r = requests.get(URL,params=params)
             try:
