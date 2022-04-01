@@ -9,19 +9,42 @@ import sys
 import subprocess
 import traceback
 import random
+import json
 
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 
-'geopy'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'geopy'])
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
-API_URL = os.environ.get('API_URL') + '/event'
+#API_URL = os.environ.get('API_URL')
+API_URL = 'http://6817-35-227-50-192.ngrok.io'
 
-txt = st.text_input('Location', '')
 
-df_catalog = pd.read_csv('streamlit_server/web_server/catlog_data.csv')
-#df_catalog = pd.read_csv('./catlog_data.csv')
+isAuthenticated = False
+
+if isAuthenticated is False:
+    user_container = st.empty()
+    username = user_container.text_input('Email Address', '')
+
+    pass_container = st.empty()
+    password = pass_container.text_input('Password', type="password")
+
+auth_container = st.empty()
+
+if isAuthenticated is True:
+    user_container.empty()
+    pass_container.empty()
+    auth_container.empty()
+
+    sub_container = st.empty()
+    submit = sub_container.button("Submit")
+    print("ASdasdasd")
+    txt = st.text_input('Location', '')
+    sub_container.button('Submit', on_click=location_func)
+
+#df_catalog = pd.read_csv('streamlit_server/web_server/catlog_data.csv')
+df_catalog = pd.read_csv('./catlog_data.csv')
 images_dir = './'
+
 
 def get_coordinates(location):
     # initialize Nominatim API 
@@ -49,6 +72,119 @@ def get_event_id(lat,long):
     return max, event_id
 
 
+def location_func():
+    print("Loc Func In")
+
+    txt = st.text_input('Locations')
+    st.button('Submit', on_click=location_func)
+    print("Text ", txt)
+
+
+    if txt == '' or txt.isnumeric():
+        print("Loc Func in If")
+        # try to print an error message on frontend
+        st.write("Wrong Input")
+
+    else:
+        print("Loc Func in Else")
+        lat,long = get_coordinates(txt)
+        
+        max,event_id = get_event_id(lat,long)
+        
+        if event_id:
+            st.write(event_id)
+            #params = {"idx_id": str(event_id)[-2:]}
+            params = {"idx_id": random.randrange(10,50)}
+            URL = API_URL + "/event"
+            r = requests.get(URL,params=params)
+            try:
+                r_json = r.json()
+                if r_json:
+                    image_b64 = r_json.get('data')
+                    with open(os.path.join(images_dir, 'image.png'), "wb") as file:
+                        file.write(base64.b64decode(image_b64))
+
+                    st.image(os.path.join(images_dir, 'image.png'))
+            except:
+                print(traceback.format_exc())
+                st.write(f'No records found for {txt}')
+        else:
+            st.write("Location not found")
+
+
+if auth_container.button('Authenticate'):
+
+    if isAuthenticated:
+    
+        if txt == '' or txt.isnumeric():
+            # try to print an error message on frontend
+            st.write("Wrong Input")
+
+        else:
+            lat,long = get_coordinates(txt)
+            
+            max,event_id = get_event_id(lat,long)
+            
+            if event_id:
+                st.write(event_id)
+                #params = {"idx_id": str(event_id)[-2:]}
+                params = {"idx_id": random.randrange(10,50)}
+                URL = API_URL + "/event"
+                r = requests.get(API_URL,params=params)
+                try:
+                    r_json = r.json()
+                    if r_json:
+                        image_b64 = r_json.get('data')
+                        with open(os.path.join(images_dir, 'image.png'), "wb") as file:
+                            file.write(base64.b64decode(image_b64))
+
+                        st.image(os.path.join(images_dir, 'image.png'))
+                except:
+                    print(traceback.format_exc())
+                    st.write(f'No records found for {txt}')
+            else:
+                st.write("Location not found")
+
+    else:
+        if username == '' or password == '':
+            # try to print an error message on frontend
+            st.write("Please enter valid credentials")
+        
+        else:
+
+            URL = API_URL + "/user/login"
+            body = {
+                "email": username,
+                "password": password
+            }
+            login = requests.post(URL, data=json.dumps(body))
+            try:
+                login_json = login.json()
+                if login_json:
+                    access_token = login_json.get('access_token')
+                    if access_token:
+                        isAuthenticated = True
+                        txt = st.text_input('Locationss')
+                        st.button('Submit', on_click=location_func)
+
+                        user_container.empty()
+                        pass_container.empty()
+                        auth_container.empty()
+
+                        print("Loc Func Ex")
+                            
+                    else:
+                        st.write("Invalid credentials")
+            except:
+                st.write("Error occured, please try again")
+
+
+
+
+
+
+
+
 
 
 # all cities below work
@@ -64,8 +200,6 @@ def get_event_id(lat,long):
 #providence
 #pawtucket
 #chesapeake
-
-
 
 import unittest
 
@@ -144,41 +278,3 @@ class TestWeatherMethods(unittest.TestCase):
         max, event = get_event_id(lat,long)
         self.assertEqual(event, 841365)
         #image part can be added checking if the generated image matches the output image on the frontend
-
-
-
-
-if st.button('Submit'):
-    
-    if txt == '' or txt.isnumeric():
-        # try to print an error message on frontend
-        st.write("Wrong Input")
-
-    else:
-        lat,long = get_coordinates(txt)
-        
-        max,event_id = get_event_id(lat,long)
-        
-        if event_id:
-            st.write(event_id)
-            #params = {"idx_id": str(event_id)[-2:]}
-            params = {"idx_id": random.randrange(10,50)}
-            r = requests.get(API_URL,params=params)
-            try:
-                r_json = r.json()
-                if r_json:
-                    image_b64 = r_json.get('data')
-                    with open(os.path.join(images_dir, 'image.png'), "wb") as file:
-                        file.write(base64.b64decode(image_b64))
-
-                    st.image(os.path.join(images_dir, 'image.png'))
-            except:
-                print(traceback.format_exc())
-                st.write(f'No records found for {txt}')
-        else:
-            st.write("Location not found")
-
-
-
-
-
