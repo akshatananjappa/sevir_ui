@@ -3,4 +3,10 @@ pandas
 geopy==2.2.0
 requests==2.27.1
 mangum==0.11.0
+spacy-streamlit
+spacy
+./lib/en_core_web_sm-3.2.0-py3-none-any.whl
+click<=8.0.4
+#en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0-py3-none-any.whl
+# en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz
 

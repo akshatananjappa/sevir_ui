@@ -15,11 +15,12 @@ subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'geopy'])
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
-API_URL = os.environ.get('API_URL', '')
-#API_URL = 'http://6817-35-227-50-192.ngrok.io'
+#API_URL = os.environ.get('API_URL', '')
+API_URL = 'http://0de8-34-125-11-146.ngrok.io'
 
 
 isAuthenticated = False
+bearerToken = ''
 
 if isAuthenticated is False:
     user_container = st.empty()
@@ -41,8 +42,8 @@ if isAuthenticated is True:
     txt = st.text_input('Location', '')
     sub_container.button('Submit', on_click=location_func)
 
-df_catalog = pd.read_csv('web_server/catlog_data.csv')
-#df_catalog = pd.read_csv('./catlog_data.csv')
+#df_catalog = pd.read_csv('web_server/catlog_data.csv')
+df_catalog = pd.read_csv('./catlog_data.csv')
 images_dir = './'
 
 
@@ -95,16 +96,22 @@ def location_func():
             st.write(event_id)
             #params = {"idx_id": str(event_id)[-2:]}
             params = {"idx_id": random.randrange(10,50), "location": txt}
+            headers = {'Authorization' : bearerToken}
+            print(headers)
             URL = API_URL + "/event"
-            r = requests.get(URL,params=params)
+            r = requests.get(URL,params=params,headers=headers)
             try:
                 r_json = r.json()
-                if r_json:
+                if r_json.get('message') and not r_json.get('data'):
+                    st.write(r_json.get('message'))
+                elif r_json:
                     image_b64 = r_json.get('data')
                     with open(os.path.join(images_dir, 'image.png'), "wb") as file:
                         file.write(base64.b64decode(image_b64))
 
                     st.image(os.path.join(images_dir, 'image.png'))
+                else:
+                    sst.write(r_json.get('message'))
             except:
                 print(traceback.format_exc())
                 st.write(f'No records found for {txt}')
@@ -129,6 +136,7 @@ if auth_container.button('Authenticate'):
                 st.write(event_id)
                 #params = {"idx_id": str(event_id)[-2:]}
                 params = {"idx_id": random.randrange(10,50)}
+                
                 URL = API_URL + "/event"
                 r = requests.get(API_URL,params=params)
                 try:
@@ -164,6 +172,7 @@ if auth_container.button('Authenticate'):
                     access_token = login_json.get('access_token')
                     if access_token:
                         isAuthenticated = True
+                        bearerToken = access_token
                         txt = st.text_input('Locationss')
                         st.button('Submit', on_click=location_func)
 
