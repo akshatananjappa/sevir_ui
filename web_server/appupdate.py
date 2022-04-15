@@ -195,7 +195,7 @@ def process_summarization(server_url: str):
 def page_third():
     x=st.session_state.int
     st.session_state.int = x
-    DATA_URL="./eventnarratives.csv"
+    DATA_URL="web_server/eventnarratives.csv"
     data = st.cache(pd.read_csv)(DATA_URL)
     nlp_option = st.radio("Services", st.session_state["options"], key="radio")
     row = data["EPISODE_NARRATIVE"][x]
