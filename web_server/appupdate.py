@@ -22,7 +22,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
 #API_URL = os.environ.get('API_URL', '')
-API_URL = 'http://6bd1-35-231-199-105.ngrok.io'
+API_URL = 'http://fc6b-34-125-170-146.ngrok.io'
 
 if 'isAuthenticated' not in st.session_state:
     st.session_state.isAuthenticated = False
