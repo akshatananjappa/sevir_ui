@@ -22,7 +22,8 @@ subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'geopy'])
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
-API_URL = 'http://0de8-34-125-11-146.ngrok.io'
+API_URL = os.environ.get('API_URL', '')
+#API_URL = 'http://0de8-34-125-11-146.ngrok.io'
 
 if 'isAuthenticated' not in st.session_state:
     st.session_state.isAuthenticated = False
@@ -131,7 +132,8 @@ def page_second():
                 else:
                     st.write("Location not found")
 
-df_catalog = pd.read_csv('./catlog_data.csv')
+df_catalog = pd.read_csv('web_server/catlog_data.csv')
+#df_catalog = pd.read_csv('./catlog_data.csv')
 images_dir = './'
 
 
