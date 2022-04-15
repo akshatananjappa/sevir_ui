@@ -7,5 +7,5 @@ spacy-streamlit
 spacy
 ./lib/en_core_web_sm-3.2.0-py3-none-any.whl
 click<=8.0.4
-textblob
+textblob==0.17.1
 
