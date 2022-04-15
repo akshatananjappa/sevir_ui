@@ -1,3 +1,7 @@
+import subprocess
+import os
+import sys
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'geopy', 'textblob'])
 from html import entities
 import streamlit as st
 import pandas as pd
@@ -11,14 +15,9 @@ import random
 from pydoc import locate
 import streamlit.components.v1 as components
 import base64
-import os
-import sys
-import subprocess
 import traceback
 import random
 import json
-
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'geopy'])
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
